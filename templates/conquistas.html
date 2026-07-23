@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<section class="painel ativa">
+
+    <div class="cartao cartao-nivel" style="margin-bottom: 20px;">
+        <span class="eyebrow" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--tinta-suave);">Nível gastronômico</span>
+        <h2 class="titulo-nivel">{{ nivel_atual }}</h2>
+        <div class="pontos-nivel" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; font-weight: 600; color: var(--mostarda-escura); margin-bottom: 12px;">{{ pontos }} pontos</div>
+        <div class="barra-progresso">
+            <div class="barra-progresso-preenchida" style="width: {{ progresso_nivel }}%"></div>
+        </div>
+        {% if proximo_minimo %}
+            <p class="texto-proximo-nivel" style="margin-top: 8px;">{{ proximo_minimo - pontos }} pontos pro próximo nível</p>
+        {% else %}
+            <p class="texto-proximo-nivel" style="margin-top: 8px;">Nível máximo alcançado! 👑</p>
+        {% endif %}
+    </div>
+
+    <div class="grade-resumo">
+        <div class="resumo-item">
+            <div class="resumo-numero">{{ total_visitas }}</div>
+            <div class="resumo-legenda">visitas</div>
+        </div>
+        <div class="resumo-item">
+            <div class="resumo-numero">{{ total_lugares }}</div>
+            <div class="resumo-legenda">lugares</div>
+        </div>
+        <div class="resumo-item">
+            <div class="resumo-numero">{{ total_desafios }}</div>
+            <div class="resumo-legenda">desafios</div>
+        </div>
+    </div>
+
+    <div class="titulo-secao">Conquistas Descobertas ({{ desbloqueadas }}/{{ total_conquistas }})</div>
+    
+    <div class="grade-conquistas" style="display: flex; flex-direction: column; gap: 12px;">
+        {% for c in lista_conquistas %}
+            {% if c.desbloqueada %}
+            <div class="badge-conquista desbloqueada" style="display: flex; align-items: center; gap: 16px; background: var(--branco); border-radius: 16px; padding: 16px; box-shadow: 0 6px 16px var(--sombra);">
+                <div class="badge-emoji" style="font-size: 2.2rem;">{{ c.emoji }}</div>
+                <div style="flex: 1;">
+                    <div class="badge-titulo" style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 1rem; color: var(--verde-escuro);">{{ c.titulo }}</div>
+                    <div class="badge-descricao" style="font-size: 0.85rem; color: var(--tinta); margin: 2px 0 0;">{{ c.descricao }}</div>
+                </div>
+                <div style="font-size: 1.2rem;">✨</div>
+            </div>
+            {% else %}
+            <div class="badge-conquista bloqueada" style="display: flex; align-items: center; gap: 16px; background: rgba(0,0,0,0.03); border: 1.5px dashed var(--papel-escuro); border-radius: 16px; padding: 16px; opacity: 0.7;">
+                <div class="badge-emoji" style="font-size: 2.0rem; filter: grayscale(100%);">🔒</div>
+                <div style="flex: 1;">
+                    <div class="badge-titulo" style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 0.95rem; color: var(--tinta-suave);">Conquista Secreta</div>
+                    <div class="badge-descricao" style="font-size: 0.8rem; color: var(--tinta-suave); margin: 2px 0 0;">Continue explorando para desbloquear...</div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</section>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<section class="painel ativa">
+    {% if dias|length == 0 %}
+        <div class="vazio">
+            <div class="emoji">📸</div>
+            <p>Nenhuma foto ainda.<br>As fotos que vocês registrarem aparecem aqui, organizadas por dia.</p>
+        </div>
+    {% else %}
+        {% for dia in dias %}
+        <div class="grupo-dia">
+            <div class="titulo-dia">{{ dia.texto }}</div>
+
+            <div class="monte">
+                <div class="pilha-fechada" aria-label="Toque para abrir as fotos deste dia">
+                    {% for foto in dia.fotos[:3] %}
+                        {% set index_loop = loop.index0 %}
+                        <div class="foto-pilha-item" style="z-index:{{ loop.index }}; transform: translateX(-50%) translateY({{ index_loop * 4 }}px) rotate({{ (index_loop * 4) - 4 }}deg);">
+                            <img src="{{ url_for('static', filename='uploads/' + foto.arquivo) }}">
+                        </div>
+                    {% endfor %}
+                    {% if dia.fotos|length > 1 %}
+                        <span class="contador-mais">+{{ dia.fotos|length - 1 }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="grade-aberta">
+                    {% for foto in dia.fotos %}
+                    <div class="polaroid {{ 'capa-destaque' if foto.capa == 1 else '' }}" style="transform: rotate({{ (loop.index0 * 3) % 9 - 4 }}deg)"
+                         onclick="abrirModal(
+                            {{ foto.local|tojson }},
+                            {{ foto.data_iso|tojson }},
+                            {{ foto.atendimento }},
+                            {{ foto.ambiente }},
+                            {{ foto.sabor }},
+                            {{ foto.notas|tojson }},
+                            {{ url_for('static', filename='uploads/' + foto.arquivo)|tojson }},
+                            {{ foto.registro_id }},
+                            {{ foto.desafio|tojson }},
+                            {{ foto.desafio_concluido|tojson }},
+                            {{ foto.id }},
+                            {{ foto.capa }}
+                         )">
+                        <img src="{{ url_for('static', filename='uploads/' + foto.arquivo) }}">
+                        {% if foto.capa == 1 %}
+                            <div class="selo-capa-polaroid">⭐ Capa</div>
+                        {% endif %}
+                        <div class="legenda-autor">{{ foto.notas if foto.notas else foto.local }} - {{ foto.autor }} - {{ foto.data_curta }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</section>
+
+<div class="modal-fundo" id="modal-fundo">
+    <div class="modal-conteudo" id="modal-conteudo"></div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    function fecharModal() {
+        document.getElementById('modal-fundo').classList.remove('aberto');
+    }
+
+    function abrirModal(local, dataIso, atendimento, ambiente, sabor, notas, fotoUrl, registroId, desafio, desafioConcluido, fotoId, eCapa) {
+        const [ano, mes, dia] = dataIso.split('-');
+        const dataFormatada = dia + '/' + mes + '/' + ano;
+        const div = document.createElement('div');
+        div.textContent = local;
+        const localEscapado = div.innerHTML;
+        div.textContent = notas;
+        const notasEscapadas = div.innerHTML;
+        div.textContent = desafio;
+        const desafioEscapado = div.innerHTML;
+
+        const blocoDesafio = desafio
+            ? `<div class="desafio-modal">🎯 <strong>Desafio${desafioConcluido ? ' concluído 🏅' : ''}:</strong> ${desafioEscapado}</div>`
+            : '';
+
+        const botaoCapaHtml = eCapa === 1 
+            ? `<div style="text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--verde-escuro); background: rgba(75,99,85,0.1); padding: 8px; border-radius: 8px; margin-bottom: 10px;">⭐ Esta é a foto de capa deste dia</div>`
+            : `<form method="POST" action="/memorias/capa/${fotoId}" style="margin-bottom: 10px;"><button type="submit" style="width: 100%; background: var(--mostarda-escura); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">⭐ Definir como Foto de Capa do Dia</button></form>`;
+
+        document.getElementById('modal-conteudo').innerHTML = `
+            <button class="modal-fechar" onclick="fecharModal()">✕</button>
+            <img src="${fotoUrl}">
+            <h3>${localEscapado}</h3>
+            <div class="data-modal">${dataFormatada} · Atend. ${atendimento.toFixed(1)} · Ambiente ${ambiente.toFixed(1)} · Sabor ${sabor.toFixed(1)}</div>
+            ${blocoDesafio}
+            ${notas ? '<div class="notas-modal">' + notasEscapadas + '</div>' : ''}
+            ${botaoCapaHtml}
+            <form method="POST" action="/excluir/${registroId}" onsubmit="return confirm('Excluir este registro (nota e todas as fotos)? Não dá pra desfazer.');">
+                <button type="submit" class="modal-excluir">Excluir este registro</button>
+            </form>
+        `;
+        document.getElementById('modal-fundo').classList.add('aberto');
+    }
+
+    document.getElementById('modal-fundo').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-fundo') fecharModal();
+    });
+
+    (function () {
+        const montes = document.querySelectorAll('.monte');
+        const prefereReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (prefereReduzido) {
+            montes.forEach((m) => m.classList.add('aberto'));
+            return;
+        }
+
+        const observador = new IntersectionObserver((entradas) => {
+            entradas.forEach((entrada) => {
+                if (entrada.isIntersecting) {
+                    entrada.target.classList.add('aberto');
+                    observador.unobserve(entrada.target);
+                }
+            });
+        }, { threshold: 0.35 });
+
+        montes.forEach((m) => observador.observe(m));
+
+        document.querySelectorAll('.pilha-fechada').forEach((pilha) => {
+            pilha.addEventListener('click', () => {
+                pilha.closest('.monte').classList.add('aberto');
+            });
+        });
+    })();
+</script>
+<style>
+    .selo-capa-polaroid {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: var(--mostarda-escura);
+        color: white;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.55rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

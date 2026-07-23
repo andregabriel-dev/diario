@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<section class="painel ativa">
+    <div class="cartao">
+        {% if desejo_id %}
+            <div class="banner-desejo">🎯 Avaliando um lugar da lista de desejos</div>
+        {% endif %}
+        {% if desafio_sorteado %}
+            <div class="banner-desafio">
+                <span class="rotulo-desafio">Desafio de hoje</span>
+                <p>{{ desafio_sorteado }}</p>
+            </div>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data" id="form-registro">
+            <input type="hidden" name="desejo_id" value="{{ desejo_id }}">
+            <input type="hidden" name="desafio" value="{{ desafio_sorteado }}">
+            <div class="campo">
+                <label for="campo-local">Nome do lugar</label>
+                <input type="text" id="campo-local" name="local" placeholder="Ex: Restaurante Coreano"
+                       value="{{ local_prefill }}" required>
+            </div>
+
+            <div class="campo">
+                <label for="campo-data">Data da visita</label>
+                <input type="date" id="campo-data" name="data" value="{{ hoje }}" required>
+            </div>
+
+            <div class="campo">
+                <label>Atendimento <span class="slider-valor" id="valor-atendimento">8.0</span></label>
+                <div class="slider-linha">
+                    <input type="range" name="atendimento" id="campo-atendimento" min="0" max="10" step="0.5" value="8">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Ambiente <span class="slider-valor" id="valor-ambiente">8.0</span></label>
+                <div class="slider-linha">
+                    <input type="range" name="ambiente" id="campo-ambiente" min="0" max="10" step="0.5" value="8">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Sabor <span class="slider-valor" id="valor-sabor">8.0</span></label>
+                <div class="slider-linha">
+                    <input type="range" name="sabor" id="campo-sabor" min="0" max="10" step="0.5" value="8">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="campo-notas">Observações (opcional)</label>
+                <textarea name="notas" id="campo-notas" placeholder="Algo pra lembrar depois..."></textarea>
+            </div>
+
+            {% if desafio_sorteado %}
+            <div class="campo campo-checkbox">
+                <label class="rotulo-checkbox">
+                    <input type="checkbox" name="desafio_concluido" value="1">
+                    Conseguimos completar o desafio! 🏅
+                </label>
+            </div>
+            {% endif %}
+
+            <div class="campo">
+                <label>Fotos</label>
+                <label class="upload-area" id="area-upload" for="campo-fotos">
+                    <input type="file" name="fotos" id="campo-fotos" accept="image/*" multiple>
+                    <span id="texto-upload">📷 Toque para escolher fotos</span>
+                </label>
+                <div class="previa-fotos" id="previa-fotos"></div>
+            </div>
+
+            <button type="submit" class="botao-principal">Salvar registro</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block script %}
+<script>
+    [['campo-atendimento', 'valor-atendimento'], ['campo-ambiente', 'valor-ambiente'], ['campo-sabor', 'valor-sabor']]
+        .forEach(([inputId, valorId]) => {
+            const input = document.getElementById(inputId);
+            const valor = document.getElementById(valorId);
+            input.addEventListener('input', () => {
+                valor.textContent = parseFloat(input.value).toFixed(1);
+            });
+        });
+
+    const campoFotos = document.getElementById('campo-fotos');
+    const previaFotos = document.getElementById('previa-fotos');
+    const textoUpload = document.getElementById('texto-upload');
+
+    campoFotos.addEventListener('change', () => {
+        const arquivos = Array.from(campoFotos.files);
+        textoUpload.textContent = arquivos.length
+            ? arquivos.length + ' foto(s) selecionada(s)'
+            : '📷 Toque para escolher fotos';
+        previaFotos.innerHTML = arquivos.map((a) => '<img src="' + URL.createObjectURL(a) + '">').join('');
+    });
+</script>
+{% endblock %}

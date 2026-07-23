@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mudar Senha - Nosso Diário Gastronômico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app app-entrar">
+    <div class="cartao cartao-entrar">
+        <h1 class="titulo-entrar">✨ Primeiro Acesso</h1>
+        <p>Olá, <strong>{{ session.get('nome') }}</strong>! Por segurança, escolha uma nova senha pessoal:</p>
+        <form method="POST">
+            <input type="password" name="nova_senha" placeholder="Nova senha" required autofocus>
+            <button type="submit" class="botao-principal">Salvar e Continuar</button>
+        </form>
+        {% if erro %}<div class="aviso erro">{{ erro }}</div>{% endif %}
+    </div>
+</div>
+</body>
+</html>

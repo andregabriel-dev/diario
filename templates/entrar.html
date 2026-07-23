@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar - Nosso Diário Gastronômico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app app-entrar">
+    <div class="cartao-entrar">
+        <!-- Imagem chique de restaurante gerada por IA / Unsplash de alta qualidade -->
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80" alt="Restaurante" class="foto-capa-entrar">
+        
+        <h1 class="titulo-entrar">Diário Gastronômico</h1>
+        <p>Insira seu usuário e senha para acessar.</p>
+        
+        <form method="POST">
+            <input type="text" name="usuario" placeholder="Usuário (ex: andre ou joyce)" required autofocus>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <button type="submit" class="botao-principal">Entrar</button>
+        </form>
+        {% if erro %}<div class="aviso erro" style="margin-top: 12px; color: var(--vermelho); font-size: 0.85rem; font-weight: 600;">{{ erro }}</div>{% endif %}
+    </div>
+</div>
+</body>
+</html>

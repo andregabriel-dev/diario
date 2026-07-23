@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<section class="painel ativa">
+    {% if lista|length == 0 %}
+        <div class="vazio">
+            <div class="emoji">🏆</div>
+            <p>Nenhum lugar avaliado ainda.<br>Registre a primeira visita na aba Registrar.</p>
+        </div>
+    {% else %}
+        {% for item in lista %}
+        <div class="item-ranking">
+            <div class="posicao">{{ loop.index }}º</div>
+            {% if item.capa %}
+                <img class="capa-ranking" src="{{ url_for('static', filename='uploads/' + item.capa) }}">
+            {% else %}
+                <div class="capa-ranking"></div>
+            {% endif %}
+            <div class="info-ranking">
+                <h3>{{ item.nome }}</h3>
+                <div class="visitas">{{ item.visitas }} visita{{ 's' if item.visitas > 1 else '' }}</div>
+                <div class="chips-categoria">
+                    <span class="chip">Atend. {{ '%.1f'|format(item.atendimento) }}</span>
+                    <span class="chip">Ambiente {{ '%.1f'|format(item.ambiente) }}</span>
+                    <span class="chip">Sabor {{ '%.1f'|format(item.sabor) }}</span>
+                </div>
+            </div>
+            <div class="nota-geral">{{ '%.1f'|format(item.geral) }}<small>geral</small></div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</section>
+{% endblock %}

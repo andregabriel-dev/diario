@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Nosso Diário Gastronômico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app">
+
+    <header class="topo">
+        <span class="selo">registro de rolês</span>
+        <h1>Nosso Diário Gastronômico</h1>
+        <p>Toda comida que a gente experimenta junto, guardada aqui.</p>
+        {% if session.get('nome') %}<p class="quem-logado">Logado como {{ session['nome'] }}</p>{% endif %}
+    </header>
+
+    <!-- Menu em formato de pílula/canhoto flutuante idêntico à sua base -->
+    <nav class="abas">
+        <a href="{{ url_for('desejos') }}" class="{{ 'ativa' if ativa == 'desejos' else '' }}">Desejos</a>
+        <a href="{{ url_for('ranking') }}" class="{{ 'ativa' if ativa == 'ranking' else '' }}">Ranking</a>
+        <a href="{{ url_for('memorias') }}" class="{{ 'ativa' if ativa == 'memorias' else '' }}">Memórias</a>
+        <a href="{{ url_for('conquistas') }}" class="{{ 'ativa' if ativa == 'conquistas' else '' }}">Conquistas</a>
+    </nav>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, texto in mensagens %}
+                <div class="flash flash-{{ categoria }}">{{ texto }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block conteudo %}{% endblock %}
+
+    <footer class="rodape">
+        <a href="{{ url_for('sair') }}">Sair</a>
+    </footer>
+</div>
+
+{% block script %}{% endblock %}
+</body>
+</html>
