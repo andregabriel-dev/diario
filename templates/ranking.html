@@ -1,32 +1,49 @@
 {% extends 'base.html' %}
 {% block conteudo %}
 <section class="painel ativa">
+
+    <div class="titulo-secao" style="margin-bottom: 16px;">🏆 Ranking de Restaurantes</div>
+
     {% if lista|length == 0 %}
         <div class="vazio">
-            <div class="emoji">🏆</div>
-            <p>Nenhum lugar avaliado ainda.<br>Registre a primeira visita na aba Registrar.</p>
+            <div class="emoji">⭐</div>
+            <p>Nenhum restaurante fechado ainda.<br>Encerrem um rolê para ele aparecer no ranking!</p>
         </div>
     {% else %}
-        {% for item in lista %}
-        <div class="item-ranking">
-            <div class="posicao">{{ loop.index }}º</div>
-            {% if item.capa %}
-                <img class="capa-ranking" src="{{ url_for('static', filename='uploads/' + item.capa) }}">
-            {% else %}
-                <div class="capa-ranking"></div>
-            {% endif %}
-            <div class="info-ranking">
-                <h3>{{ item.nome }}</h3>
-                <div class="visitas">{{ item.visitas }} visita{{ 's' if item.visitas > 1 else '' }}</div>
-                <div class="chips-categoria">
-                    <span class="chip">Atend. {{ '%.1f'|format(item.atendimento) }}</span>
-                    <span class="chip">Ambiente {{ '%.1f'|format(item.ambiente) }}</span>
-                    <span class="chip">Sabor {{ '%.1f'|format(item.sabor) }}</span>
+        <div class="lista-ranking" style="display: flex; flex-direction: column; gap: 14px;">
+            {% for item in lista %}
+            <div class="item-ranking" style="display: flex; align-items: center; gap: 14px; background: var(--branco); border-radius: 18px; padding: 16px; box-shadow: 0 8px 20px var(--sombra);">
+                
+                <div class="posicao" style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.4rem; color: {% if loop.index == 1 %}var(--mostarda-escura){% elif loop.index == 2 %}#7f8c8d{% elif loop.index == 3 %}#d35400{% else %}var(--tinta-suave){% endif %}; min-width: 28px; text-align: center;">
+                    {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}#{{ loop.index }}{% endif %}
                 </div>
+
+                {% if item.capa %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.capa) }}" class="capa-ranking" style="width: 58px; height: 58px; border-radius: 14px; object-fit: cover; flex-shrink: 0; box-shadow: 0 4px 10px var(--sombra);">
+                {% else %}
+                    <div class="capa-ranking" style="width: 58px; height: 58px; border-radius: 14px; background: var(--papel-escuro); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🍽️</div>
+                {% endif %}
+
+                <div class="info-ranking" style="flex: 1; min-width: 0;">
+                    <h3 style="margin: 0 0 3px; font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--tinta);">{{ item.nome }}</h3>
+                    <div class="visitas" style="font-size: 0.75rem; color: var(--tinta-suave); margin-bottom: 6px;">{{ item.visitas }} {% if item.visitas == 1 %}visita{% else %}visitas{% endif %}</div>
+                    
+                    <div class="chips-categoria" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <span class="chip" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; background: var(--papel); border-radius: 6px; padding: 2px 6px; color: var(--tinta-suave);">Atend. {{ "%.1f"|format(item.atendimento) }}</span>
+                        <span class="chip" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; background: var(--papel); border-radius: 6px; padding: 2px 6px; color: var(--tinta-suave);">Amb. {{ "%.1f"|format(item.ambiente) }}</span>
+                        <span class="chip" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; background: var(--papel); border-radius: 6px; padding: 2px 6px; color: var(--tinta-suave);">Sabor {{ "%.1f"|format(item.sabor) }}</span>
+                    </div>
+                </div>
+
+                <div class="nota-geral" style="font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.25rem; color: var(--verde-escuro); text-align: right; flex-shrink: 0;">
+                    {{ "%.1f"|format(item.geral) }}
+                    <small style="display: block; font-size: 0.58rem; color: var(--tinta-suave); font-weight: 500; text-transform: uppercase;">Média</small>
+                </div>
+
             </div>
-            <div class="nota-geral">{{ '%.1f'|format(item.geral) }}<small>geral</small></div>
+            {% endfor %}
         </div>
-        {% endfor %}
     {% endif %}
+
 </section>
 {% endblock %}

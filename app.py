@@ -18,17 +18,52 @@ app.config['SECRET_KEY'] = os.environ.get('DIARIO_SECRET_KEY', 'troque-esta-chav
 
 EXTENSOES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'webp'}
 
+# Lista de desafios com pesos/pontos diferentes
 DESAFIOS = [
-    'Peça o prato que o garçom indicar, sem perguntar o que é.',
-    'Tente adivinhar a nota que o outro vai dar pro ambiente antes de ele(a) falar.',
-    'Peçam pra dividir a sobremesa, mesmo que vocês digam que não vão querer.',
-    'Descubra o prato mais estranho do cardápio e leiam a descrição em voz alta.',
-    'Tirem uma foto dos dois sem sorrir de propósito.',
-    'Peça uma bebida que você nunca provou antes.',
-    'Tentem adivinhar o preço da conta antes de ela chegar.',
-    'Conversem sobre o primeiro encontro de vocês enquanto esperam o pedido.',
-    'Peçam pra experimentar o prato um do outro antes de comer o próprio.',
-    'Descubram juntos qual é o ingrediente secreto de algum prato do menu.',
+    # Fáceis (10 pontos)
+    {'texto': 'Tire uma selfie com seu acompanhante.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Faça um brinde.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Tire uma foto do ambiente.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Avalie a apresentação do prato.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Faça um elogio sincero ao cozinheiro ou ao atendimento.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Descubra o significado do nome do restaurante.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Escolha um prato apenas pela foto.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Peça uma bebida da casa.', 'pontos': 10, 'tipo': 'fácil'},
+    {'texto': 'Escolha uma bebida sem álcool diferente.', 'pontos': 10, 'tipo': 'fácil'},
+    
+    # Médios (20 pontos)
+    {'texto': 'Pedir o prato que o garçom sugerir.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Experimentar o prato do outro antes de comer o seu.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Pedir uma bebida que nunca tomou antes.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Pedir a entrada mais estranha do cardápio.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Escolha o prato mais vendido da casa.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Experimente uma entrada.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Peça uma sobremesa.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Peça o prato com o nome mais curioso.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Peça uma bebida artesanal.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Conte quantos ingredientes você consegue identificar no prato.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Tire uma foto criativa do prato.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Pergunte ao garçom qual prato ele mais gosta.', 'pontos': 20, 'tipo': 'médio'},
+    {'texto': 'Escolha um prato usando apenas o nome, sem ler a descrição.', 'pontos': 20, 'tipo': 'médio'},
+    
+    # Difíceis (35 pontos)
+    {'texto': 'Feche os olhos, o que apontar terá que pedir.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Experimente um ingrediente que nunca comeu.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Peça um prato com um ingrediente que normalmente você evita.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Feche os olhos e deixe seu acompanhante escolher.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Experimente algo que você jamais pediria normalmente.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Combine uma bebida sugerida pelo garçom.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Escolha um número de 1 a 10 e peça o prato correspondente no cardápio.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Jogue cara ou coroa para decidir entre dois pratos.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Escreva uma avaliação com pelo menos 100 caracteres.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Descubra a história do restaurante e compartilhe uma curiosidade.', 'pontos': 35, 'tipo': 'difícil'},
+    {'texto': 'Encontre o item mais barato do cardápio e diga se valeu a pena.', 'pontos': 35, 'tipo': 'difícil'},
+    
+    # Raros / Especiais (50 pontos - 5% de chance de virar sorteio especial)
+    {'texto': '🏆 Desafio Raro: Complete todos os desafios desta visita.', 'pontos': 50, 'tipo': 'raro'},
+    {'texto': '🎲 Desafio Raro: Deixe o garçom montar sua refeição inteira.', 'pontos': 50, 'tipo': 'raro'},
+    {'texto': '🌍 Desafio Raro: Peça o prato mais tradicional da casa.', 'pontos': 50, 'tipo': 'raro'},
+    {'texto': '👑 Desafio Raro: Peça o prato mais caro do cardápio (com opção de recusar sem penalidade).', 'pontos': 50, 'tipo': 'raro'},
 ]
 
 CONQUISTAS = [
@@ -51,8 +86,14 @@ NIVEIS = [
     (500, 'Mestres Cuca'),
 ]
 
-def calcular_pontos(total_visitas, total_desafios):
-    return total_visitas * 10 + total_desafios * 20
+def calcular_pontos(db_conexo, total_visitas):
+    pontos_visitas = total_visitas * 15
+    # Conta 20 pontos para cada desafio concluído (ou o valor padrão)
+    total_desafios_concluidos = db_conexo.execute(
+        "SELECT COUNT(*) FROM registros WHERE status = 'fechado' AND desafio_concluido = 1"
+    ).fetchone()[0] or 0
+    
+    return pontos_visitas + (total_desafios_concluidos * 20)
 
 def titulo_do_nivel(pontos):
     titulo = NIVEIS[0][1]
@@ -95,6 +136,7 @@ def inicializar_db():
                 autor TEXT,
                 desafio TEXT,
                 desafio_concluido INTEGER DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'fechado',
                 criado_em TEXT NOT NULL
             )
         ''')
@@ -116,7 +158,10 @@ def inicializar_db():
             )
         ''')
 
-        # Migração caso a coluna capa não exista na tabela fotos
+        colunas_registros = [c[1] for c in db.execute('PRAGMA table_info(registros)').fetchall()]
+        if 'status' not in colunas_registros:
+            db.execute("ALTER TABLE registros ADD COLUMN status TEXT NOT NULL DEFAULT 'fechado'")
+
         colunas_fotos = [c[1] for c in db.execute('PRAGMA table_info(fotos)').fetchall()]
         if 'capa' not in colunas_fotos:
             db.execute('ALTER TABLE fotos ADD COLUMN capa INTEGER NOT NULL DEFAULT 0')
@@ -212,7 +257,6 @@ def sair():
     session.clear()
     return redirect(url_for('entrar'))
 
-# ---------- Página Inicial / Lista de Desejos ----------
 @app.route('/', methods=['GET', 'POST'])
 def desejos():
     db = get_db()
@@ -233,14 +277,13 @@ def desejos():
 
     lista = db.execute('SELECT * FROM desejos WHERE visitado = 0 ORDER BY criado_em DESC').fetchall()
     
-    # Dados para a tela inicial (destaques, total de visitados, foto do dia)
-    total_visitas = db.execute('SELECT COUNT(*) FROM registros').fetchone()[0]
-    total_lugares = db.execute('SELECT COUNT(DISTINCT LOWER(TRIM(local))) FROM registros').fetchone()[0]
+    total_visitas = db.execute("SELECT COUNT(*) FROM registros WHERE status = 'fechado'").fetchone()[0]
+    total_lugares = db.execute("SELECT COUNT(DISTINCT LOWER(TRIM(local))) FROM registros WHERE status = 'fechado'").fetchone()[0]
     
-    # Foto do dia (pega a foto mais recente cadastrada)
     foto_recente = db.execute('''
         SELECT f.arquivo, r.local, r.data, r.autor 
         FROM fotos f JOIN registros r ON f.registro_id = r.id 
+        WHERE r.status = 'fechado'
         ORDER BY r.data DESC, f.id DESC LIMIT 1
     ''').fetchone()
 
@@ -256,34 +299,70 @@ def excluir_desejo(desejo_id):
     flash('Removido da lista.', 'sucesso')
     return redirect(url_for('desejos'))
 
-# ---------- Registrar (avaliação de uma visita) ----------
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
+    db = get_db()
+    registro_aberto = db.execute("SELECT * FROM registros WHERE status = 'aberto' ORDER BY id DESC LIMIT 1").fetchone()
+
     if request.method == 'POST':
+        acao = request.form.get('acao')
+        
+        if acao == 'fechar' and registro_aberto:
+            reg_id = registro_aberto['id']
+            atendimento = float(request.form.get('atendimento', registro_aberto['atendimento']))
+            ambiente = float(request.form.get('ambiente', registro_aberto['ambiente']))
+            sabor = float(request.form.get('sabor', registro_aberto['sabor']))
+            notas = request.form.get('notas', '').strip() or registro_aberto['notas']
+            desafio_concluido = 1 if request.form.get('desafio_concluido') else registro_aberto['desafio_concluido']
+
+            db.execute('''
+                UPDATE registros SET atendimento = ?, ambiente = ?, sabor = ?, notas = ?, 
+                desafio_concluido = ?, status = 'fechado' WHERE id = ?
+            ''', (atendimento, ambiente, sabor, notas, desafio_concluido, reg_id))
+
+            for arquivo in request.files.getlist('fotos'):
+                if arquivo and arquivo.filename:
+                    nome_salvo = salvar_foto_comprimida(arquivo)
+                    if nome_salvo:
+                        db.execute('INSERT INTO fotos (registro_id, arquivo) VALUES (?, ?)', (reg_id, nome_salvo))
+
+            db.commit()
+            flash('Rolê encerrado e enviado para as memórias! ✨🍽️', 'sucesso')
+            return redirect(url_for('memorias'))
+
+        if registro_aberto and acao == 'adicionar':
+            reg_id = registro_aberto['id']
+            for arquivo in request.files.getlist('fotos'):
+                if arquivo and arquivo.filename:
+                    nome_salvo = salvar_foto_comprimida(arquivo)
+                    if nome_salvo:
+                        db.execute('INSERT INTO fotos (registro_id, arquivo) VALUES (?, ?)', (reg_id, nome_salvo))
+            db.commit()
+            flash('Novas fotos adicionadas ao rolê em aberto! 📸', 'sucesso')
+            return redirect(url_for('registrar'))
+
         local = request.form.get('local', '').strip()
         data = request.form.get('data', '').strip()
         notas = request.form.get('notas', '').strip()
         desejo_id = request.form.get('desejo_id', '').strip()
         desafio = request.form.get('desafio', '').strip()
-        desafio_concluido = 1 if request.form.get('desafio_concluido') else 0
 
         try:
-            atendimento = float(request.form.get('atendimento', 0))
-            ambiente = float(request.form.get('ambiente', 0))
-            sabor = float(request.form.get('sabor', 0))
+            atendimento = float(request.form.get('atendimento', 8))
+            ambiente = float(request.form.get('ambiente', 8))
+            sabor = float(request.form.get('sabor', 8))
         except ValueError:
-            atendimento = ambiente = sabor = 0
+            atendimento = ambiente = sabor = 8
 
         if not local or not data:
             flash('Preencha ao menos o nome do lugar e a data.', 'erro')
             return redirect(url_for('registrar'))
 
-        db = get_db()
         cursor = db.execute(
             'INSERT INTO registros (local, data, atendimento, ambiente, sabor, notas, autor, '
-            'desafio, desafio_concluido, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'desafio, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "aberto", ?)',
             (local, data, atendimento, ambiente, sabor, notas, session.get('nome', ''),
-             desafio or None, desafio_concluido, datetime.utcnow().isoformat())
+             desafio or None, datetime.utcnow().isoformat())
         )
         registro_id = cursor.lastrowid
 
@@ -297,24 +376,45 @@ def registrar():
             db.execute('UPDATE desejos SET visitado = 1 WHERE id = ?', (desejo_id,))
 
         db.commit()
-        flash('Registro salvo! ✅', 'sucesso')
-        return redirect(url_for('desejos'))
+        flash('Restaurante aberto! Vocês podem adicionar mais fotos a qualquer momento. 🍷', 'sucesso')
+        return redirect(url_for('registrar'))
 
     hoje = datetime.now().strftime('%Y-%m-%d')
     local_prefill = request.args.get('local', '')
     desejo_id = request.args.get('desejo_id', '')
-    desafio_sorteado = random.choice(DESAFIOS) if desejo_id else ''
+    desafio_sorteado = random.choice(DESAFIOS) if desejo_id and not registro_aberto else ''
+    
+    fotos_abertas = []
+    if registro_aberto:
+        fotos_abertas = db.execute('SELECT * FROM fotos WHERE registro_id = ?', (registro_aberto['id'],)).fetchall()
+
     return render_template('registrar.html', ativa='desejos', hoje=hoje,
                             local_prefill=local_prefill, desejo_id=desejo_id,
-                            desafio_sorteado=desafio_sorteado)
+                            desafio_sorteado=desafio_sorteado, registro_aberto=registro_aberto,
+                            fotos_abertas=fotos_abertas)
 
-# ---------- Conquistas ----------
+@app.route('/memorias/capa/<int:foto_id>', methods=['POST'])
+def definir_capa(foto_id):
+    db = get_db()
+    foto = db.execute('SELECT r.data FROM fotos f JOIN registros r ON f.registro_id = r.id WHERE f.id = ?', (foto_id,)).fetchone()
+    if foto:
+        data_registro = foto['data']
+        db.execute('''
+            UPDATE fotos SET capa = 0 WHERE registro_id IN (
+                SELECT id FROM registros WHERE data = ?
+            )
+        ''', (data_registro,))
+        db.execute('UPDATE fotos SET capa = 1 WHERE id = ?', (foto_id,))
+        db.commit()
+        flash('Foto de capa do dia atualizada! ✨', 'sucesso')
+    return redirect(url_for('memorias'))
+
 @app.route('/conquistas')
 def conquistas():
     db = get_db()
-    total_visitas = db.execute('SELECT COUNT(*) FROM registros').fetchone()[0]
-    total_lugares = db.execute('SELECT COUNT(DISTINCT LOWER(TRIM(local))) FROM registros').fetchone()[0]
-    total_desafios = db.execute('SELECT COUNT(*) FROM registros WHERE desafio_concluido = 1').fetchone()[0]
+    total_visitas = db.execute("SELECT COUNT(*) FROM registros WHERE status = 'fechado'").fetchone()[0]
+    total_lugares = db.execute("SELECT COUNT(DISTINCT LOWER(TRIM(local))) FROM registros WHERE status = 'fechado'").fetchone()[0]
+    total_desafios = db.execute("SELECT COUNT(*) FROM registros WHERE status = 'fechado' AND desafio_concluido = 1").fetchone()[0]
 
     totais = {'visitas': total_visitas, 'lugares': total_lugares, 'desafios': total_desafios}
 
@@ -326,7 +426,7 @@ def conquistas():
         lista_conquistas.append({**c, 'atual': atual, 'desbloqueada': desbloqueada, 'progresso': progresso})
 
     desbloqueadas = sum(1 for c in lista_conquistas if c['desbloqueada'])
-    pontos = calcular_pontos(total_visitas, total_desafios)
+    pontos = calcular_pontos(db, total_visitas)
     nivel_atual = titulo_do_nivel(pontos)
 
     proximo_minimo = None
@@ -349,11 +449,10 @@ def conquistas():
         proximo_minimo=proximo_minimo, progresso_nivel=progresso_nivel
     )
 
-# ---------- Ranking ----------
 @app.route('/ranking')
 def ranking():
     db = get_db()
-    registros = db.execute('SELECT * FROM registros').fetchall()
+    registros = db.execute("SELECT * FROM registros WHERE status = 'fechado'").fetchall()
 
     grupos = {}
     for r in registros:
@@ -371,11 +470,20 @@ def ranking():
         geral = (atendimento + ambiente + sabor) / 3
 
         capa = None
-        for item in sorted(itens, key=lambda i: i['data'], reverse=True):
-            foto = db.execute('SELECT arquivo FROM fotos WHERE registro_id = ? LIMIT 1', (item['id'],)).fetchone()
-            if foto:
-                capa = foto['arquivo']
+        # Procura primeiro se há uma foto marcada explicitamente como capa
+        for item in itens:
+            foto_capa = db.execute('SELECT arquivo FROM fotos WHERE registro_id = ? AND capa = 1 LIMIT 1', (item['id'],)).fetchone()
+            if foto_capa:
+                capa = foto_capa['arquivo']
                 break
+        
+        # Se não houver capa marcada, pega a mais recente
+        if not capa:
+            for item in sorted(itens, key=lambda i: i['data'], reverse=True):
+                foto = db.execute('SELECT arquivo FROM fotos WHERE registro_id = ? LIMIT 1', (item['id'],)).fetchone()
+                if foto:
+                    capa = foto['arquivo']
+                    break
 
         lista.append({
             'nome': grupo['nome'], 'visitas': n, 'atendimento': atendimento,
@@ -385,21 +493,22 @@ def ranking():
     lista.sort(key=lambda x: x['geral'], reverse=True)
     return render_template('ranking.html', ativa='ranking', lista=lista)
 
-# ---------- Memórias ----------
 @app.route('/memorias')
 def memorias():
     db = get_db()
-    registros = db.execute('SELECT * FROM registros ORDER BY data DESC').fetchall()
+    registros = db.execute("SELECT * FROM registros WHERE status = 'fechado' ORDER BY data DESC").fetchall()
 
     por_dia = {}
     for r in registros:
-        fotos = db.execute('SELECT id, arquivo FROM fotos WHERE registro_id = ?', (r['id'],)).fetchall()
+        fotos = db.execute('SELECT id, arquivo, capa FROM fotos WHERE registro_id = ? ORDER BY capa DESC, id DESC', (r['id'],)).fetchall()
         if not fotos:
             continue
         data_curta = formatar_data_curta(r['data'])
         for foto in fotos:
             por_dia.setdefault(r['data'], []).append({
+                'id': foto['id'],
                 'arquivo': foto['arquivo'],
+                'capa': foto['capa'],
                 'local': r['local'],
                 'autor': r['autor'] or '',
                 'data_iso': r['data'],
@@ -415,35 +524,12 @@ def memorias():
 
     dias = []
     for data_iso in sorted(por_dia.keys(), reverse=True):
-        dias.append({'texto': formatar_data_longa(data_iso), 'fotos': por_dia[data_iso]})
+        # Reordena as fotos do dia para que a capa marcada fique sempre em primeiro lugar na pilha
+        fotos_dia = sorted(por_dia[data_iso], key=lambda x: x['capa'], reverse=True)
+        dias.append({'texto': formatar_data_longa(data_iso), 'fotos': fotos_dia})
 
     return render_template('memorias.html', ativa='memorias', dias=dias)
 
-
-
-#--------Capa memórias---------
-@app.route('/memorias/capa/<int:foto_id>', methods=['POST'])
-def definir_capa(foto_id):
-    db = get_db()
-    # Descobre a qual registro essa foto pertence
-    foto = db.execute('SELECT r.data FROM fotos f JOIN registros r ON f.registro_id = r.id WHERE f.id = ?', (foto_id,)).fetchone()
-    if foto:
-        data_registro = foto['data']
-        # Reseta a capa de todas as fotos dos registros desse mesmo dia
-        db.execute('''
-            UPDATE fotos SET capa = 0 WHERE registro_id IN (
-                SELECT id FROM registros WHERE data = ?
-            )
-        ''', (data_registro,))
-        # Define esta foto específica como capa
-        db.execute('UPDATE fotos SET capa = 1 WHERE id = ?', (foto_id,))
-        db.commit()
-        flash('Foto de capa do dia atualizada! ✨', 'sucesso')
-    return redirect(url_for('memorias'))
-
-
-
-# ---------- Excluir ----------
 @app.route('/excluir/<int:registro_id>', methods=['POST'])
 def excluir(registro_id):
     db = get_db()

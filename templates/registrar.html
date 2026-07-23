@@ -2,74 +2,103 @@
 {% block conteudo %}
 <section class="painel ativa">
     <div class="cartao">
-        {% if desejo_id %}
-            <div class="banner-desejo">🎯 Avaliando um lugar da lista de desejos</div>
+        {% if registro_aberto %}
+            <div class="banner-desejo" style="background: rgba(217,164,65,0.15); color: var(--mostarda-escura); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 16px; font-weight: 600;">
+                🍷 Rolê em Andamento: <strong>{{ registro_aberto.local }}</strong>
+                <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px;">Adicione mais fotos tiradas agora ou preencha os dados abaixo para fechar a conta.</div>
+            </div>
+
+            {% if fotos_abertas %}
+            <div class="campo">
+                <label>Fotos já adicionadas neste rolê ({{ fotos_abertas|length }})</label>
+                <div class="previa-fotos" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                    {% for f in fotos_abertas %}
+                        <img src="{{ url_for('static', filename='uploads/' + f.arquivo) }}" style="width: 62px; height: 62px; object-fit: cover; border-radius: 10px;">
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         {% endif %}
-        {% if desafio_sorteado %}
+
+        {% if desejo_id and not registro_aberto %}
+            <div class="banner-desejo">✨ Iniciando visita a partir da lista de desejos</div>
+        {% endif %}
+        
+        {% if desafio_sorteado and not registro_aberto %}
             <div class="banner-desafio">
                 <span class="rotulo-desafio">Desafio de hoje</span>
                 <p>{{ desafio_sorteado }}</p>
             </div>
         {% endif %}
+
         <form method="POST" enctype="multipart/form-data" id="form-registro">
             <input type="hidden" name="desejo_id" value="{{ desejo_id }}">
             <input type="hidden" name="desafio" value="{{ desafio_sorteado }}">
+            
             <div class="campo">
                 <label for="campo-local">Nome do lugar</label>
                 <input type="text" id="campo-local" name="local" placeholder="Ex: Restaurante Coreano"
-                       value="{{ local_prefill }}" required>
+                       value="{{ registro_aberto.local if registro_aberto else local_prefill }}" {% if registro_aberto %}readonly style="opacity: 0.8;"{% else %}required{% endif %}>
             </div>
 
             <div class="campo">
                 <label for="campo-data">Data da visita</label>
-                <input type="date" id="campo-data" name="data" value="{{ hoje }}" required>
+                <input type="date" id="campo-data" name="data" value="{{ registro_aberto.data if registro_aberto else hoje }}" required {% if registro_aberto %}readonly{% endif %}>
             </div>
 
             <div class="campo">
-                <label>Atendimento <span class="slider-valor" id="valor-atendimento">8.0</span></label>
+                <label>Atendimento <span class="slider-valor" id="valor-atendimento">{{ registro_aberto.atendimento if registro_aberto else '8.0' }}</span></label>
                 <div class="slider-linha">
-                    <input type="range" name="atendimento" id="campo-atendimento" min="0" max="10" step="0.5" value="8">
+                    <input type="range" name="atendimento" id="campo-atendimento" min="0" max="10" step="0.5" value="{{ registro_aberto.atendimento if registro_aberto else '8' }}">
                 </div>
             </div>
 
             <div class="campo">
-                <label>Ambiente <span class="slider-valor" id="valor-ambiente">8.0</span></label>
+                <label>Ambiente <span class="slider-valor" id="valor-ambiente">{{ registro_aberto.ambiente if registro_aberto else '8.0' }}</span></label>
                 <div class="slider-linha">
-                    <input type="range" name="ambiente" id="campo-ambiente" min="0" max="10" step="0.5" value="8">
+                    <input type="range" name="ambiente" id="campo-ambiente" min="0" max="10" step="0.5" value="{{ registro_aberto.ambiente if registro_aberto else '8' }}">
                 </div>
             </div>
 
             <div class="campo">
-                <label>Sabor <span class="slider-valor" id="valor-sabor">8.0</span></label>
+                <label>Sabor <span class="slider-valor" id="valor-sabor">{{ registro_aberto.sabor if registro_aberto else '8.0' }}</span></label>
                 <div class="slider-linha">
-                    <input type="range" name="sabor" id="campo-sabor" min="0" max="10" step="0.5" value="8">
+                    <input type="range" name="sabor" id="campo-sabor" min="0" max="10" step="0.5" value="{{ registro_aberto.sabor if registro_aberto else '8' }}">
                 </div>
             </div>
 
             <div class="campo">
                 <label for="campo-notas">Observações (opcional)</label>
-                <textarea name="notas" id="campo-notas" placeholder="Algo pra lembrar depois..."></textarea>
+                <textarea name="notas" id="campo-notas" placeholder="Algo pra lembrar depois...">{{ registro_aberto.notas if registro_aberto else '' }}</textarea>
             </div>
 
-            {% if desafio_sorteado %}
+            {% if registro_aberto and registro_aberto.desafio %}
+            <div style="font-size: 0.85rem; background: var(--papel); padding: 10px; border-radius: 10px; margin-bottom: 14px;">
+                🎯 <strong>Desafio do rolê:</strong> {{ registro_aberto.desafio }}
+            </div>
             <div class="campo campo-checkbox">
                 <label class="rotulo-checkbox">
-                    <input type="checkbox" name="desafio_concluido" value="1">
+                    <input type="checkbox" name="desafio_concluido" value="1" {% if registro_aberto.desafio_concluido == 1 %}checked{% endif %}>
                     Conseguimos completar o desafio! 🏅
                 </label>
             </div>
             {% endif %}
 
             <div class="campo">
-                <label>Fotos</label>
+                <label>Adicionar Fotos</label>
                 <label class="upload-area" id="area-upload" for="campo-fotos">
                     <input type="file" name="fotos" id="campo-fotos" accept="image/*" multiple>
-                    <span id="texto-upload">📷 Toque para escolher fotos</span>
+                    <span id="texto-upload">📸 Toque para escolher fotos</span>
                 </label>
                 <div class="previa-fotos" id="previa-fotos"></div>
             </div>
 
-            <button type="submit" class="botao-principal">Salvar registro</button>
+            {% if registro_aberto %}
+                <button type="submit" name="acao" value="adicionar" class="botao-principal" style="background: var(--mostarda-escura); margin-bottom: 10px;">Adicionar fotos ao rolê</button>
+                <button type="submit" name="acao" value="fechar" class="botao-principal" onclick="return confirm('Encerrar o rolê e enviar tudo para as memórias?');">🏁 Fechar Conta / Encerrar Rolê</button>
+            {% else %}
+                <button type="submit" class="botao-principal">Iniciar Visita (Deixar Aberto)</button>
+            {% endif %}
         </form>
     </div>
 </section>
@@ -94,7 +123,7 @@
         const arquivos = Array.from(campoFotos.files);
         textoUpload.textContent = arquivos.length
             ? arquivos.length + ' foto(s) selecionada(s)'
-            : '📷 Toque para escolher fotos';
+            : '📸 Toque para escolher fotos';
         previaFotos.innerHTML = arquivos.map((a) => '<img src="' + URL.createObjectURL(a) + '">').join('');
     });
 </script>
