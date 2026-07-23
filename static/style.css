@@ -373,3 +373,80 @@ footer.rodape a {
     color: var(--tinta-suave);
     text-decoration: underline;
 }
+/* ===== Correção do Formulário de Desejos ===== */
+.form-desejo { margin-bottom: 18px; }
+.campo-inline {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+}
+.campo-inline input {
+    flex: 1;
+    width: 100%;
+}
+.botao-compacto {
+    width: auto !important;
+    white-space: nowrap;
+    padding: 12px 20px !important;
+}
+
+/* ===== Correção dos Itens da Lista de Desejos ===== */
+.lista-desejos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.item-desejo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--branco);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 16px var(--sombra);
+}
+.info-desejo {
+    flex: 1;
+    min-width: 0;
+}
+.info-desejo h3 {
+    margin: 0 0 2px;
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.adicionado-por {
+    font-size: 0.74rem;
+    color: var(--tinta-suave);
+}
+.acoes-desejo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.link-vamos {
+    background: var(--verde);
+    color: var(--branco);
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 9px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.botao-remover-desejo {
+    border: none;
+    background: var(--papel);
+    color: var(--tinta-suave);
+    width: 30px; 
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
