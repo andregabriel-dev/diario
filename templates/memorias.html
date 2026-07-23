@@ -45,7 +45,7 @@
                         {% if foto.capa == 1 %}
                             <div class="selo-capa-polaroid">⭐ Capa</div>
                         {% endif %}
-                        <div class="legenda-autor">{{ foto.notas if foto.notas else foto.local }} - {{ foto.autor }} - {{ foto.data_curta }}</div>
+                        <div class="legenda-autor">{{ foto.autor }} - {{ foto.data_curta }} - {{ foto.notas if foto.notas else foto.local }}</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -87,14 +87,14 @@
 
         document.getElementById('modal-conteudo').innerHTML = `
             <button class="modal-fechar" onclick="fecharModal()">✕</button>
-            <img src="${fotoUrl}">
+            <img src="${fotoUrl}" style="width:100%; border-radius:12px; margin-bottom:14px; display:block;">
             <h3>${localEscapado}</h3>
-            <div class="data-modal">${dataFormatada} · Atend. ${atendimento.toFixed(1)} · Ambiente ${ambiente.toFixed(1)} · Sabor ${sabor.toFixed(1)}</div>
+            <div class="data-modal" style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--tinta-suave); margin-bottom:12px;">${dataFormatada} · Atend. ${atendimento.toFixed(1)} · Ambiente ${ambiente.toFixed(1)} · Sabor ${sabor.toFixed(1)}</div>
             ${blocoDesafio}
-            ${notas ? '<div class="notas-modal">' + notasEscapadas + '</div>' : ''}
+            ${notas ? '<div class="notas-modal" style="font-size:0.9rem; color:var(--tinta-suave); margin-bottom:12px; white-space:pre-wrap;">' + notasEscapadas + '</div>' : ''}
             ${botaoCapaHtml}
             <form method="POST" action="/excluir/${registroId}" onsubmit="return confirm('Excluir este registro (nota e todas as fotos)? Não dá pra desfazer.');">
-                <button type="submit" class="modal-excluir">Excluir este registro</button>
+                <button type="submit" class="modal-excluir" style="border:none; background:none; color:var(--vermelho); font-size:0.8rem; font-weight:600; cursor:pointer; padding:8px 0;">Excluir este registro</button>
             </form>
         `;
         document.getElementById('modal-fundo').classList.add('aberto');

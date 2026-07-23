@@ -20,11 +20,8 @@ html, body {
     min-height: 100%;
     background-color: var(--papel);
     background-image:
-        url("textura-fundo.svg"),
         radial-gradient(circle at 10% 5%, rgba(217,164,65,0.10), transparent 40%),
         radial-gradient(circle at 90% 90%, rgba(75,99,85,0.08), transparent 45%);
-    background-repeat: repeat, no-repeat, no-repeat;
-    background-size: 220px 220px, auto, auto;
     color: var(--tinta);
     font-family: 'Inter', sans-serif;
 }
@@ -265,69 +262,98 @@ button.botao-principal:active { transform: scale(0.97); }
     margin-bottom: 12px;
 }
 
-.campo-inline {
-    display: flex;
-    gap: 10px;
-    margin: 0;
-}
-.campo-inline input { flex: 1; }
-.botao-compacto {
-    width: auto;
-    white-space: nowrap;
-    padding: 12px 20px;
-}
-.botao-sortear {
-    background: var(--mostarda-escura);
-    margin-bottom: 14px;
-}
-.destaque-sorteio {
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--tinta);
+/* ===== Memórias / Polaroides Compactas ===== */
+.grupo-dia { margin-bottom: 28px; }
+.titulo-dia {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--tinta-suave);
+    border-bottom: 1.5px dashed var(--papel-escuro);
+    padding-bottom: 8px;
     margin-bottom: 16px;
 }
-.destaque-sorteio:empty { display: none; }
-
-.lista-desejos { display: flex; flex-direction: column; gap: 10px; }
-.item-desejo {
+.grade-aberta {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: flex-start;
+}
+.polaroid {
     background: var(--branco);
-    border-radius: 14px;
-    padding: 14px 16px;
+    padding: 8px 8px 36px 8px;
+    border-radius: 4px;
+    box-shadow: 0 8px 18px var(--sombra);
+    width: 140px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    position: relative;
+}
+.polaroid:active { transform: scale(0.96); }
+@media (hover: hover) {
+    .polaroid:hover { transform: translateY(-3px) rotate(0deg) !important; }
+}
+.polaroid img {
+    width: 124px;
+    height: 124px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+}
+.polaroid .legenda-autor {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--tinta);
+}
+
+/* Pilha de fotos fechada */
+.monte { position: relative; margin-bottom: 12px; }
+.pilha-fechada {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+.foto-pilha-item {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 120px; height: 120px;
+    background: var(--branco);
+    padding: 6px 6px 24px 6px;
+    border-radius: 4px;
     box-shadow: 0 6px 16px var(--sombra);
 }
-.item-desejo.sorteado {
-    box-shadow: 0 0 0 2.5px var(--mostarda), 0 10px 24px var(--sombra);
-    transform: scale(1.02);
+.foto-pilha-item img {
+    width: 108px; height: 90px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
 }
-.info-desejo h3 {
-    margin: 0 0 2px;
-    font-family: 'Fraunces', serif;
-    font-size: 1rem;
-    font-weight: 600;
-}
-.adicionado-por { font-size: 0.74rem; color: var(--tinta-suave); }
-.acoes-desejo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.link-vamos {
+.monte.aberto .pilha-fechada { display: none; }
+.monte:not(.aberto) .grade-aberta { display: none; }
+.contador-mais {
+    position: absolute;
+    top: 8px; right: 8px;
     background: var(--verde);
-    color: var(--branco);
-    font-weight: 600;
-    font-size: 0.82rem;
-    padding: 9px 16px;
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 2px 6px;
     border-radius: 999px;
-    text-decoration: none;
-}
-.botao-remover-desejo {
-    border: none;
-    background: var(--papel);
-    color: var(--tinta-suave);
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
+    z-index: 30;
+    font-weight: 600;
 }
 
 .vazio {
