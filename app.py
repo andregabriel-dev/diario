@@ -59,7 +59,7 @@ DESAFIOS = [
     {'texto': 'Descubra a história do restaurante e compartilhe uma curiosidade.', 'pontos': 35, 'tipo': 'difícil'},
     {'texto': 'Encontre o item mais barato do cardápio e diga se valeu a pena.', 'pontos': 35, 'tipo': 'difícil'},
     
-    # Raros / Especiais (50 pontos - 5% de chance de virar sorteio especial)
+    # Raros / Especiais (50 pontos)
     {'texto': '🏆 Desafio Raro: Complete todos os desafios desta visita.', 'pontos': 50, 'tipo': 'raro'},
     {'texto': '🎲 Desafio Raro: Deixe o garçom montar sua refeição inteira.', 'pontos': 50, 'tipo': 'raro'},
     {'texto': '🌍 Desafio Raro: Peça o prato mais tradicional da casa.', 'pontos': 50, 'tipo': 'raro'},
@@ -88,11 +88,9 @@ NIVEIS = [
 
 def calcular_pontos(db_conexo, total_visitas):
     pontos_visitas = total_visitas * 15
-    # Conta 20 pontos para cada desafio concluído (ou o valor padrão)
     total_desafios_concluidos = db_conexo.execute(
         "SELECT COUNT(*) FROM registros WHERE status = 'fechado' AND desafio_concluido = 1"
     ).fetchone()[0] or 0
-    
     return pontos_visitas + (total_desafios_concluidos * 20)
 
 def titulo_do_nivel(pontos):
@@ -327,7 +325,7 @@ def registrar():
                         db.execute('INSERT INTO fotos (registro_id, arquivo) VALUES (?, ?)', (reg_id, nome_salvo))
 
             db.commit()
-            flash('Rolê encerrado e enviado para as memórias! ✨🍽️', 'sucesso')
+            flash('Visita encerrada e enviada para as memórias! ✨🍽️', 'sucesso')
             return redirect(url_for('memorias'))
 
         if registro_aberto and acao == 'adicionar':
@@ -338,7 +336,7 @@ def registrar():
                     if nome_salvo:
                         db.execute('INSERT INTO fotos (registro_id, arquivo) VALUES (?, ?)', (reg_id, nome_salvo))
             db.commit()
-            flash('Novas fotos adicionadas ao rolê em aberto! 📸', 'sucesso')
+            flash('Novas fotos adicionadas à visita em aberto! 📸', 'sucesso')
             return redirect(url_for('registrar'))
 
         local = request.form.get('local', '').strip()
@@ -346,6 +344,7 @@ def registrar():
         notas = request.form.get('notas', '').strip()
         desejo_id = request.form.get('desejo_id', '').strip()
         desafio = request.form.get('desafio', '').strip()
+        desafio_concluido = 1 if request.form.get('desafio_concluido') else 0
 
         try:
             atendimento = float(request.form.get('atendimento', 8))
@@ -360,9 +359,9 @@ def registrar():
 
         cursor = db.execute(
             'INSERT INTO registros (local, data, atendimento, ambiente, sabor, notas, autor, '
-            'desafio, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "aberto", ?)',
+            'desafio, desafio_concluido, status, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, "aberto", ?)',
             (local, data, atendimento, ambiente, sabor, notas, session.get('nome', ''),
-             desafio or None, datetime.utcnow().isoformat())
+             desafio or None, desafio_concluido, datetime.utcnow().isoformat())
         )
         registro_id = cursor.lastrowid
 
@@ -382,7 +381,11 @@ def registrar():
     hoje = datetime.now().strftime('%Y-%m-%d')
     local_prefill = request.args.get('local', '')
     desejo_id = request.args.get('desejo_id', '')
-    desafio_sorteado = random.choice(DESAFIOS) if desejo_id and not registro_aberto else ''
+    
+    desafio_sorteado = None
+    if desejo_id and not registro_aberto:
+        escolhido = random.choice(DESAFIOS)
+        desafio_sorteado = escolhido['texto']
     
     fotos_abertas = []
     if registro_aberto:
@@ -390,8 +393,8 @@ def registrar():
 
     return render_template('registrar.html', ativa='desejos', hoje=hoje,
                             local_prefill=local_prefill, desejo_id=desejo_id,
-                            desafio_sorteado=desafio_sorteado, registro_aberto=registro_aberto,
-                            fotos_abertas=fotos_abertas)
+                            desafio_sorteado=desafio_sorteado,
+                            fotos_abertas=fotos_abertas, registro_aberto=registro_aberto)
 
 @app.route('/memorias/capa/<int:foto_id>', methods=['POST'])
 def definir_capa(foto_id):
@@ -470,14 +473,12 @@ def ranking():
         geral = (atendimento + ambiente + sabor) / 3
 
         capa = None
-        # Procura primeiro se há uma foto marcada explicitamente como capa
         for item in itens:
             foto_capa = db.execute('SELECT arquivo FROM fotos WHERE registro_id = ? AND capa = 1 LIMIT 1', (item['id'],)).fetchone()
             if foto_capa:
                 capa = foto_capa['arquivo']
                 break
         
-        # Se não houver capa marcada, pega a mais recente
         if not capa:
             for item in sorted(itens, key=lambda i: i['data'], reverse=True):
                 foto = db.execute('SELECT arquivo FROM fotos WHERE registro_id = ? LIMIT 1', (item['id'],)).fetchone()
@@ -524,7 +525,6 @@ def memorias():
 
     dias = []
     for data_iso in sorted(por_dia.keys(), reverse=True):
-        # Reordena as fotos do dia para que a capa marcada fique sempre em primeiro lugar na pilha
         fotos_dia = sorted(por_dia[data_iso], key=lambda x: x['capa'], reverse=True)
         dias.append({'texto': formatar_data_longa(data_iso), 'fotos': fotos_dia})
 

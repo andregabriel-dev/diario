@@ -2,38 +2,46 @@
 {% block conteudo %}
 <section class="painel ativa">
     <div class="cartao">
-        {% if registro_aberto %}
-            <div class="banner-desejo" style="background: rgba(217,164,65,0.15); color: var(--mostarda-escura); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 16px; font-weight: 600;">
-                🍷 Rolê em Andamento: <strong>{{ registro_aberto.local }}</strong>
-                <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px;">Adicione mais fotos tiradas agora ou preencha os dados abaixo para fechar a conta.</div>
-            </div>
-
-            {% if fotos_abertas %}
-            <div class="campo">
-                <label>Fotos já adicionadas neste rolê ({{ fotos_abertas|length }})</label>
-                <div class="previa-fotos" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
-                    {% for f in fotos_abertas %}
-                        <img src="{{ url_for('static', filename='uploads/' + f.arquivo) }}" style="width: 62px; height: 62px; object-fit: cover; border-radius: 10px;">
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-        {% endif %}
-
-        {% if desejo_id and not registro_aberto %}
-            <div class="banner-desejo">✨ Iniciando visita a partir da lista de desejos</div>
-        {% endif %}
-        
-        {% if desafio_sorteado and not registro_aberto %}
-            <div class="banner-desafio">
-                <span class="rotulo-desafio">Desafio de hoje</span>
-                <p>{{ desafio_sorteado }}</p>
-            </div>
-        {% endif %}
-
         <form method="POST" enctype="multipart/form-data" id="form-registro">
+            {% if registro_aberto %}
+                <div class="banner-desejo" style="background: rgba(217,164,65,0.15); color: var(--mostarda-escura); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 16px; font-weight: 600;">
+                    🍷 Visita em Andamento: <strong>{{ registro_aberto.local }}</strong>
+                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 4px;">Adicione mais fotos tiradas agora ou preencha os dados abaixo para fechar a conta.</div>
+                </div>
+
+                {% if fotos_abertas %}
+                <div class="campo">
+                    <label>Fotos já adicionadas nesta visita ({{ fotos_abertas|length }})</label>
+                    <div class="previa-fotos" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                        {% for f in fotos_abertas %}
+                            <img src="{{ url_for('static', filename='uploads/' + f.arquivo) }}" style="width: 62px; height: 62px; object-fit: cover; border-radius: 10px;">
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            {% if desejo_id and not registro_aberto %}
+                <div class="banner-desejo">✨ Iniciando visita a partir da lista de desejos</div>
+            {% endif %}
+            
+            {% if desafio_sorteado and not registro_aberto %}
+                <div class="banner-desafio">
+                    <span class="rotulo-desafio">Desafio de hoje</span>
+                    <p>{{ desafio_sorteado }}</p>
+                </div>
+                
+                <input type="hidden" name="desafio" value="{{ desafio_sorteado }}">
+
+                <div class="campo campo-checkbox">
+                    <label class="rotulo-checkbox">
+                        <input type="checkbox" name="desafio_concluido" value="1">
+                        Conseguimos completar o desafio! 🏅
+                    </label>
+                </div>
+            {% endif %}
+
             <input type="hidden" name="desejo_id" value="{{ desejo_id }}">
-            <input type="hidden" name="desafio" value="{{ desafio_sorteado }}">
             
             <div class="campo">
                 <label for="campo-local">Nome do lugar</label>
@@ -74,7 +82,7 @@
 
             {% if registro_aberto and registro_aberto.desafio %}
             <div style="font-size: 0.85rem; background: var(--papel); padding: 10px; border-radius: 10px; margin-bottom: 14px;">
-                🎯 <strong>Desafio do rolê:</strong> {{ registro_aberto.desafio }}
+                🎯 <strong>Desafio da visita:</strong> {{ registro_aberto.desafio }}
             </div>
             <div class="campo campo-checkbox">
                 <label class="rotulo-checkbox">
@@ -94,8 +102,8 @@
             </div>
 
             {% if registro_aberto %}
-                <button type="submit" name="acao" value="adicionar" class="botao-principal" style="background: var(--mostarda-escura); margin-bottom: 10px;">Adicionar fotos ao rolê</button>
-                <button type="submit" name="acao" value="fechar" class="botao-principal" onclick="return confirm('Encerrar o rolê e enviar tudo para as memórias?');">🏁 Fechar Conta / Encerrar Rolê</button>
+                <button type="submit" name="acao" value="adicionar" class="botao-principal" style="background: var(--mostarda-escura); margin-bottom: 10px;">Adicionar fotos à visita</button>
+                <button type="submit" name="acao" value="fechar" class="botao-principal" onclick="return confirm('Encerrar a visita e enviar tudo para as memórias?');">🏁 Fechar Conta / Encerrar Visita</button>
             {% else %}
                 <button type="submit" class="botao-principal">Iniciar Visita (Deixar Aberto)</button>
             {% endif %}
