@@ -1,95 +1,27 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<section class="painel ativa">
-
-    <!-- Resumo / Destaques da Página Inicial -->
-    <div class="grade-resumo" style="margin-bottom: 18px;">
-        <div class="resumo-item">
-            <div class="resumo-numero">{{ total_visitas }}</div>
-            <div class="resumo-legenda">Visitas</div>
-        </div>
-        <div class="resumo-item">
-            <div class="resumo-numero">{{ total_lugares }}</div>
-            <div class="resumo-legenda">Lugares</div>
-        </div>
-    </div>
-
-    {% if foto_recente %}
-    <div class="cartao" style="margin-bottom: 18px; text-align: center; padding: 14px;">
-        <div class="titulo-secao" style="margin-bottom: 8px;">📸 Foto do Dia</div>
-        <img src="{{ url_for('static', filename='uploads/' + foto_recente.arquivo) }}" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 6px;">
-        <div style="font-size: 0.85rem; font-weight: 600; color: var(--tinta);">{{ foto_recente.local }}</div>
-        <div style="font-size: 0.72rem; color: var(--tinta-suave);">Registrado por {{ foto_recente.autor }}</div>
-    </div>
-    {% endif %}
-
-    <!-- Formulário para adicionar desejo -->
-    <div class="cartao form-desejo">
-        <div class="titulo-secao">Adicionar à Lista de Desejos</div>
-        <form method="POST" class="campo-inline">
-            <input type="text" name="nome" placeholder="Nome do lugar ou tipo de comida" required>
-            <button type="submit" class="botao-principal botao-compacto">Adicionar</button>
-        </form>
-    </div>
-
-    <!-- Botão de Sorteio Aleatório -->
-    {% if lista %}
-    <button type="button" class="botao-principal botao-sortear" id="botao-sortear" style="margin-bottom: 16px;">
-        🎲 Sortear Restaurante Aleatório
-    </button>
-    <div id="destaque-sorteio" class="destaque-sorteio"></div>
-    {% endif %}
-
-    <!-- Lista de Desejos Cadastrados -->
-    <div class="titulo-secao">Lista de Desejos ({{ lista|length }})</div>
-    
-    {% if lista|length == 0 %}
-        <div class="vazio">
-            <div class="emoji">📝</div>
-            <p>Sua lista de desejos está vazia.<br>Adicione restaurantes ou tipos de comida que vocês querem conhecer!</p>
-        </div>
-    {% else %}
-        <div class="lista-desejos" id="container-desejos">
-            {% for item in lista %}
-            <div class="item-desejo" data-nome="{{ item.nome }}">
-                <div class="info-desejo">
-                    <h3>{{ item.nome }}</h3>
-                    <span class="adicionado-por">Adicionado por {{ item.adicionado_por }}</span>
-                </div>
-                <div class="acoes-desejo">
-                    <a href="{{ url_for('registrar', local=item.nome, desejo_id=item.id) }}" class="link-vamos">Ir hoje! ✨</a>
-                    <form method="POST" action="{{ url_for('excluir_desejo', desejo_id=item.id) }}" onsubmit="return confirm('remover da lista?');" style="margin:0;">
-                        <button type="submit" class="botao-remover-desejo">✕</button>
-                    </form>
-                </div>
+<section class="painel ativa" style="display: flex; align-items: center; justify-content: center; min-height: 60svh;">
+    <div class="cartao cartao-entrar" style="max-width: 380px; width: 100%; text-align: center;">
+        <h1 class="titulo-entrar" style="font-family: 'Fraunces', serif; font-size: 1.5rem; margin: 0 0 6px;">✨ Entrar no Diário</h1>
+        <p style="color: var(--tinta-suave); font-size: 0.9rem; margin: 0 0 20px;">Digite suas credenciais para acessar os rolês.</p>
+        
+        <form method="POST">
+            <div class="campo" style="text-align: left; margin-bottom: 14px;">
+                <label for="usuario" style="display: block; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; margin-bottom: 7px; color: var(--tinta-suave);">Usuário</label>
+                <input type="text" id="usuario" name="usuario" placeholder="Ex: andre ou joyce" required style="width: 100%; font-family: 'Inter', sans-serif; font-size: 1rem; padding: 12px 14px; border: 1.5px solid var(--papel-escuro); border-radius: 12px; background: var(--papel); color: var(--tinta);">
             </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
+            <div class="campo" style="text-align: left; margin-bottom: 18px;">
+                <label for="senha" style="display: block; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; margin-bottom: 7px; color: var(--tinta-suave);">Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="Sua senha" required style="width: 100%; font-family: 'Inter', sans-serif; font-size: 1rem; padding: 12px 14px; border: 1.5px solid var(--papel-escuro); border-radius: 12px; background: var(--papel); color: var(--tinta);">
+            </div>
+
+            <button type="submit" class="botao-principal" style="width: 100%;">Entrar</button>
+        </form>
+
+        {% if erro %}
+            <div class="flash flash-erro" style="margin-top: 14px;">{{ erro }}</div>
+        {% endif %}
+    </div>
 </section>
-{% endblock %}
-
-{% block script %}
-<script>
-    const botaoSortear = document.getElementById('botao-sortear');
-    if (botaoSortear) {
-        botaoSortear.addEventListener('click', () => {
-            const itensDesejo = document.querySelectorAll('.item-desejo');
-            if (itensDesejo.length === 0) return;
-
-            // Remove destaque anterior
-            itensDesejo.forEach(i => i.classList.remove('sorteado'));
-
-            // Sorteia aleatoriamente
-            const sorteado = itensDesejo[Math.floor(Math.random() * itensDesejo.length)];
-            sorteado.classList.add('sorteado');
-            sorteado.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-            const nomeRestaurante = sorteado.getAttribute('data-nome');
-            const destaqueDiv = document.getElementById('destaque-sorteio');
-            destaqueDiv.innerHTML = `🎉 O escolhido foi: <strong>${nomeRestaurante}</strong>!`;
-        });
-    }
-</script>
 {% endblock %}

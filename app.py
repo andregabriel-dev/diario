@@ -14,19 +14,16 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'static', 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'diario-gastronomico-chave-super-secreta-2026'
 
 @app.after_request
 def sem_cache(response):
-    # Evita que o navegador (bfcache) mostre uma página antiga já logada
-    # depois de sair, ou uma página desatualizada ao voltar.
     if request.endpoint != 'static':
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
         response.headers['Pragma'] = 'no-cache'
     return response
-app.config['SECRET_KEY'] = os.environ.get('DIARIO_SECRET_KEY', 'troque-esta-chave-antes-de-publicar')
 
-EXTENSOES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'webp'}
+EXTENSOES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'webp', 'jfif'}
 
 # Lista de desafios com pesos/pontos diferentes
 DESAFIOS = [
@@ -217,10 +214,14 @@ def formatar_data_curta(iso):
 
 @app.before_request
 def exigir_senha():
-    rotas_livres = {'entrar', 'mudar_senha', 'static'}
+    rotas_livres = {'entrar', 'mudar_senha', 'sair', 'static'}
+    print(f"DEBUG -> Rota acessada: {request.endpoint} | Usuário na sessão: {session.get('usuario')}")
+    
     if request.endpoint in rotas_livres:
         return
+        
     if not session.get('usuario'):
+        print("DEBUG -> Usuário NÃO logado! Redirecionando para /entrar...")
         return redirect(url_for('entrar'))
 
 @app.route('/entrar', methods=['GET', 'POST'])
@@ -262,7 +263,10 @@ def mudar_senha():
 
 @app.route('/sair')
 def sair():
+    print(">>> BOTÃO SAIR FOI CLICADO! LIMPANDO SESSÃO...")
     session.clear()
+    session.pop('usuario', None)
+    session.pop('nome', None)
     return redirect(url_for('entrar'))
 
 @app.route('/', methods=['GET', 'POST'])
@@ -516,10 +520,12 @@ def ranking():
 def memorias():
     db = get_db()
     registros = db.execute("SELECT * FROM registros WHERE status = 'fechado' ORDER BY data DESC").fetchall()
+    print(f"DEBUG MEMÓRIAS -> Total de registros fechados encontrados: {len(registros)}")
 
     por_dia = {}
     for r in registros:
         fotos = db.execute('SELECT id, arquivo, capa FROM fotos WHERE registro_id = ? ORDER BY capa DESC, id DESC', (r['id'],)).fetchall()
+        print(f"DEBUG MEMÓRIAS -> Registro ID {r['id']} ({r['local']}) tem {len(fotos)} foto(s) vinculada(s).")
         if not fotos:
             continue
         data_curta = formatar_data_curta(r['data'])
