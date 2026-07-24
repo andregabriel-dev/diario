@@ -45,7 +45,7 @@
             
             <div class="campo">
                 <label for="campo-local">Nome do lugar</label>
-                <input type="text" id="campo-local" name="local" placeholder="Ex: Restaurante Coreano"
+                <input type="text" id="campo-local" name="local" placeholder="Nome do lugar"
                        value="{{ registro_aberto.local if registro_aberto else local_prefill }}" {% if registro_aberto %}readonly style="opacity: 0.8;"{% else %}required{% endif %}>
             </div>
 

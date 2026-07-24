@@ -41,6 +41,13 @@
                             {{ foto.id }},
                             {{ foto.capa }}
                          )">
+                        <form method="POST" action="{{ url_for('definir_capa', foto_id=foto.id) }}"
+                              class="form-curtir" onclick="event.stopPropagation()">
+                            <button type="submit" class="botao-curtir {{ 'curtido' if foto.capa == 1 else '' }}"
+                                    title="{{ 'Remover curtida' if foto.capa == 1 else 'Curtir e definir como capa do dia' }}">
+                                {{ '❤️' if foto.capa == 1 else '🤍' }}
+                            </button>
+                        </form>
                         <img src="{{ url_for('static', filename='uploads/' + foto.arquivo) }}">
                         {% if foto.capa == 1 %}
                             <div class="selo-capa-polaroid">⭐ Capa</div>
@@ -81,13 +88,14 @@
             ? `<div class="desafio-modal">🎯 <strong>Desafio${desafioConcluido ? ' concluído 🏅' : ''}:</strong> ${desafioEscapado}</div>`
             : '';
 
-        const botaoCapaHtml = eCapa === 1 
-            ? `<div style="text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--verde-escuro); background: rgba(75,99,85,0.1); padding: 8px; border-radius: 8px; margin-bottom: 10px;">⭐ Esta é a foto de capa deste dia</div>`
-            : `<form method="POST" action="/memorias/capa/${fotoId}" style="margin-bottom: 10px;"><button type="submit" style="width: 100%; background: var(--mostarda-escura); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">⭐ Definir como Foto de Capa do Dia</button></form>`;
+        const botaoCapaHtml = eCapa === 1
+            ? `<form method="POST" action="/memorias/capa/${fotoId}" style="margin-bottom: 10px;"><button type="submit" style="width: 100%; background: rgba(75,99,85,0.12); color: var(--verde-escuro); border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">❤️ Capa do dia · toque para remover</button></form>`
+            : `<form method="POST" action="/memorias/capa/${fotoId}" style="margin-bottom: 10px;"><button type="submit" style="width: 100%; background: var(--mostarda-escura); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">🤍 Curtir e definir como capa do dia</button></form>`;
 
         document.getElementById('modal-conteudo').innerHTML = `
             <button class="modal-fechar" onclick="fecharModal()">✕</button>
-            <img src="${fotoUrl}" style="width:100%; border-radius:12px; margin-bottom:14px; display:block;">
+            <img src="${fotoUrl}" class="modal-foto-anim" style="width:100%; border-radius:12px; margin-bottom:14px; display:block;">
+            <div class="modal-texto-anim">
             <h3>${localEscapado}</h3>
             <div class="data-modal" style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--tinta-suave); margin-bottom:12px;">${dataFormatada} · Atend. ${atendimento.toFixed(1)} · Ambiente ${ambiente.toFixed(1)} · Sabor ${sabor.toFixed(1)}</div>
             ${blocoDesafio}
@@ -96,6 +104,7 @@
             <form method="POST" action="/excluir/${registroId}" onsubmit="return confirm('Excluir este registro (nota e todas as fotos)? Não dá pra desfazer.');">
                 <button type="submit" class="modal-excluir" style="border:none; background:none; color:var(--vermelho); font-size:0.8rem; font-weight:600; cursor:pointer; padding:8px 0;">Excluir este registro</button>
             </form>
+            </div>
         `;
         document.getElementById('modal-fundo').classList.add('aberto');
     }

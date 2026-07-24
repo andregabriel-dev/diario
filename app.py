@@ -399,17 +399,25 @@ def registrar():
 @app.route('/memorias/capa/<int:foto_id>', methods=['POST'])
 def definir_capa(foto_id):
     db = get_db()
-    foto = db.execute('SELECT r.data FROM fotos f JOIN registros r ON f.registro_id = r.id WHERE f.id = ?', (foto_id,)).fetchone()
+    foto = db.execute(
+        'SELECT f.capa, r.data FROM fotos f JOIN registros r ON f.registro_id = r.id WHERE f.id = ?',
+        (foto_id,)
+    ).fetchone()
     if foto:
-        data_registro = foto['data']
-        db.execute('''
-            UPDATE fotos SET capa = 0 WHERE registro_id IN (
-                SELECT id FROM registros WHERE data = ?
-            )
-        ''', (data_registro,))
-        db.execute('UPDATE fotos SET capa = 1 WHERE id = ?', (foto_id,))
+        if foto['capa'] == 1:
+            # já era a curtida do dia -> descurtir
+            db.execute('UPDATE fotos SET capa = 0 WHERE id = ?', (foto_id,))
+            flash('Curtida removida.', 'sucesso')
+        else:
+            data_registro = foto['data']
+            db.execute('''
+                UPDATE fotos SET capa = 0 WHERE registro_id IN (
+                    SELECT id FROM registros WHERE data = ?
+                )
+            ''', (data_registro,))
+            db.execute('UPDATE fotos SET capa = 1 WHERE id = ?', (foto_id,))
+            flash('Foto curtida! Ela agora é a capa do dia. ❤️', 'sucesso')
         db.commit()
-        flash('Foto de capa do dia atualizada! ✨', 'sucesso')
     return redirect(url_for('memorias'))
 
 @app.route('/conquistas')
