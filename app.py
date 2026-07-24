@@ -14,6 +14,16 @@ UPLOAD_DIR = os.path.join(BASE_DIR, 'static', 'uploads')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = Flask(__name__)
+
+
+@app.after_request
+def sem_cache(response):
+    # Evita que o navegador (bfcache) mostre uma página antiga já logada
+    # depois de sair, ou uma página desatualizada ao voltar.
+    if request.endpoint != 'static':
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+    return response
 app.config['SECRET_KEY'] = os.environ.get('DIARIO_SECRET_KEY', 'troque-esta-chave-antes-de-publicar')
 
 EXTENSOES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'webp'}
